@@ -1,13 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateMovieDto } from './dto/create-movie.dto';
 import { UpdateMovieDto } from './dto/update-movie.dto';
-
-
-export interface Movie {
-  id:number;
-  title:string;
-  genre:string;
-}
+import { Movie } from './entity/movie.entity';
 
 
 @Injectable()
