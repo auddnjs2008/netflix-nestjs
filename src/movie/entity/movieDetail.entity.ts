@@ -10,7 +10,8 @@ export class MovieDetail {
     detail:string;
 
     @OneToOne(
-        ()=>Movie
+        ()=>Movie,
+        movie => movie.id
     )
     movie:Movie
 
