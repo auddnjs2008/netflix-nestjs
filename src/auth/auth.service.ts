@@ -8,6 +8,7 @@ import { JwtService } from '@nestjs/jwt';
 import { envVariableKeys } from 'src/common/const/env.const';
 
 @Injectable()
+
 export class AuthService {
 
     constructor(
