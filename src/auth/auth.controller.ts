@@ -25,11 +25,10 @@ export class AuthController {
 
 
   @Post('token/access')
-  async rotateAccessToken(@Headers('authorization') token:string){
-    const payload = await this.authService.parseBearerToken(token,true);
+  async rotateAccessToken(@Request() req){
 
     return{
-      accesToken: await this.authService.issueToken(payload,false)
+      accesToken: await this.authService.issueToken(req.user,false)
     }
   }
 
@@ -39,6 +38,7 @@ export class AuthController {
   @UseGuards(LocalAuthGuard)
   @Post('login/passport')
   async loginUserPassport(@Request() req){
+    console.log(req.user);
     return {
       refreshToken:await this.authService.issueToken(req.user,true),
       accessToken:await this.authService.issueToken(req.user,false)
