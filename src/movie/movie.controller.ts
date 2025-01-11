@@ -1,8 +1,9 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query, UseInterceptors, ClassSerializerInterceptor, ParseIntPipe, BadRequestException, NotFoundException, ParseFloatPipe, ParseBoolPipe, ParseArrayPipe, ParseUUIDPipe, ParseEnumPipe, DefaultValuePipe, Request } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, UseInterceptors, ClassSerializerInterceptor, ParseIntPipe, BadRequestException, NotFoundException, ParseFloatPipe, ParseBoolPipe, ParseArrayPipe, ParseUUIDPipe, ParseEnumPipe, DefaultValuePipe, Request, UseGuards } from '@nestjs/common';
 import { MovieService } from './movie.service';
 import { CreateMovieDto } from './dto/create-movie.dto';
 import { UpdateMovieDto } from './dto/update-movie.dto';
 import { MovieTitleValidationPipe } from './pipe/movie-title-validation.pipe';
+import { AuthGuard } from 'src/auth/guard/auth.guard';
 
 
 
@@ -13,10 +14,8 @@ export class MovieController {
 
   @Get()
   getMovies(
-    @Request() req: any,
     @Query('title',MovieTitleValidationPipe) title?:string,
   ){
-    console.log(req.user);
     return this.movieService.findAll(title);
   }
 
@@ -28,6 +27,7 @@ export class MovieController {
   }
 
   @Post()
+  @UseGuards(AuthGuard)
   postMovie(
     @Body() body:CreateMovieDto
 ){
