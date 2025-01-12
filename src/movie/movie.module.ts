@@ -6,6 +6,7 @@ import { Movie } from './entity/movie.entity';
 import { MovieDetail } from './entity/movieDetail.entity';
 import { Director } from 'src/director/entity/director.entity';
 import { Genre } from 'src/genre/entities/genre.entity';
+import { CommonModule } from 'src/common/common.module';
 
 @Module({
   imports:[
@@ -14,7 +15,8 @@ import { Genre } from 'src/genre/entities/genre.entity';
       MovieDetail,
       Director,
       Genre
-    ])
+    ]),
+    CommonModule
   ],
   controllers: [MovieController],
   providers: [MovieService],
