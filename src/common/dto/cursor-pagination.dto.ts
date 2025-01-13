@@ -2,7 +2,7 @@ import { IsArray, IsIn, IsInt, IsOptional, IsString } from "class-validator";
 
 export class CursorPaginationDto{
     
-    @IsInt()
+    @IsString()
     @IsOptional()
     //id_52,likeCount_20
     cursor?:string;

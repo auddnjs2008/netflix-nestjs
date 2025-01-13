@@ -20,9 +20,38 @@ export class CommonService {
     }
 
     async applyCursorPaginationParamsToQb<T>(qb:SelectQueryBuilder<T>,dto:CursorPaginationDto){
-        const {order, cursor,take} = dto;
+        let {order, cursor,take} = dto;
 
         if(cursor){
+            const decodedCursor = Buffer.from(cursor,'base64').toString('utf-8');
+              /**
+         * {
+         *      values:{
+         *          id: 27
+         *        }
+         *      order:['id_DESC']
+         * }
+         */
+            const cursorObj = JSON.parse(decodedCursor);
+            order = cursorObj.order;
+        
+            const {values} = cursorObj;
+
+            /// where (column1 > value1)
+            /// OR  (column1 = value 1 AND column2 > value2)
+            /// OR   (column1 = value 1 AND column2 = value2 AND column3 > value3)
+            /// (movie.column1, movie.column2 , movie.column3) > (:value1, :value2, :value3) => filter
+         
+            const columns = Object.keys(values);
+       
+            // 모두 DESC 아니면  ASC 이라는 가정하에 
+            const comparisonOperator = order.some((o) => o.endsWith('DESC')) ? '<' : '>';
+            const whereConditions = columns.map(c => `${qb.alias}.${c}`).join(',');
+            const whereParams = columns.map(c => `:${c}`).join(',');
+           
+
+            qb.where(`(${whereConditions}) ${comparisonOperator} (${whereParams})`,values);
+
 
         }
 
@@ -56,7 +85,7 @@ export class CommonService {
 
         /**
          * {
-         *      value:{
+         *      values:{
          *          id: 27
          *        }
          *      order:['id_DESC']
