@@ -20,6 +20,9 @@ import { RBAGuard } from './auth/guard/rbac.guard';
 import { ResponseTimeInterceptor } from './common/interceptor/response-time.interceptor';
 import { ForbiddenExceptionFilter } from './common/filter/forbidden.filter';
 import { QueryFailedExceptionFilter } from './common/filter/query-failed.filter';
+import { MulterModule } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import {join} from 'path';
 
 @Module({
   imports: [
@@ -66,7 +69,8 @@ import { QueryFailedExceptionFilter } from './common/filter/query-failed.filter'
 
     AuthModule,
 
-    UserModule
+    UserModule,
+    
   ],
   providers:[
     {
