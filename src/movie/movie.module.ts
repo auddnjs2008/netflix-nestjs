@@ -24,17 +24,17 @@ import {v4} from 'uuid'
     MulterModule.register({
       storage:diskStorage({
         destination: join(process.cwd(),'public','movie'),
-        // filename: (req,file,cb) => {
-        //   const split = file.originalname.split('.');
+        filename: (req,file,cb) => {
+          const split = file.originalname.split('.');
 
-        //   let extension = 'mp4';
+          let extension = 'mp4';
 
-        //   if(split.length > 1){
-        //     extension = split[split.length -1];
-        //   }
+          if(split.length > 1){
+            extension = split[split.length -1];
+          }
 
-        //   cb(null,`${v4()}_${Date.now()}.${extension}`);
-        // }
+          cb(null,`${v4()}_${Date.now()}.${extension}`);
+        }
       })
     })    
 

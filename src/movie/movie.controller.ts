@@ -59,9 +59,9 @@ export class MovieController {
     @Body() body:CreateMovieDto,
     @Request() req,
     @UploadedFile(
-      new MovieFilePipe({
-        maxSize:20,mimetype:'video/mp4'
-      })
+      // new MovieFilePipe({
+      //   maxSize:20,mimetype:'video/mp4'
+      // })
     ) movie:Express.Multer.File
 ){
   console.log('-------------------');
