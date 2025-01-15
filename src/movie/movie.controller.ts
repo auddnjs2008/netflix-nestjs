@@ -42,7 +42,19 @@ export class MovieController {
   @UseInterceptors(TransactionInterceptor)
   @UseInterceptors(FileFieldsInterceptor([
     {name: 'movie',maxCount:1},{name:'poster',maxCount:2}
-  ]))
+  ], {
+    limits:{
+      fileSize: 20000000,
+    },
+    fileFilter(req,file,callback){
+      console.log(file);
+      if(file.mimetype !== 'video/mp4'){
+        return callback(new BadRequestException('MP4 타입만 가능합니다!'),false);
+      }
+
+      return callback(null,true);
+    }
+  }))
   postMovie(
     @Body() body:CreateMovieDto,
     @Request() req,
@@ -53,6 +65,10 @@ export class MovieController {
 ){
   console.log('-------------------');
   console.log(files);
+
+
+
+
     return this.movieService.create(body,req.queryRunner)
   }
 
