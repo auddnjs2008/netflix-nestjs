@@ -11,6 +11,7 @@ import { GetMoviesDto } from './dto/get-movies.dto';
 import { CacheInterceptor } from 'src/common/interceptor/cache.interceptor';
 import { TransactionInterceptor } from 'src/common/interceptor/transaction.interceptor';
 import { FileFieldsInterceptor, FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
+import { MovieFilePipe } from './pipe/movie-file.pipe';
 
 
 
@@ -40,9 +41,8 @@ export class MovieController {
   @Post()
   @RBAC(Role.admin)
   @UseInterceptors(TransactionInterceptor)
-  @UseInterceptors(FileFieldsInterceptor([
-    {name: 'movie',maxCount:1},{name:'poster',maxCount:2}
-  ], {
+  @UseInterceptors(FileInterceptor(
+    'movie', {
     limits:{
       fileSize: 20000000,
     },
@@ -58,13 +58,14 @@ export class MovieController {
   postMovie(
     @Body() body:CreateMovieDto,
     @Request() req,
-    @UploadedFiles() files: {
-      movie?: Express.Multer.File[],
-      poster?: Express.Multer.File[]
-    }
+    @UploadedFile(
+      new MovieFilePipe({
+        maxSize:20,mimetype:'video/mp4'
+      })
+    ) movie:Express.Multer.File
 ){
   console.log('-------------------');
-  console.log(files);
+  console.log(movie);
 
 
 
