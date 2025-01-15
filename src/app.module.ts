@@ -23,6 +23,7 @@ import { QueryFailedExceptionFilter } from './common/filter/query-failed.filter'
 import { MulterModule } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import {join} from 'path';
+import { ServeStaticModule } from '@nestjs/serve-static';
 
 @Module({
   imports: [
@@ -60,7 +61,10 @@ import {join} from 'path';
       }),
       inject:[ConfigService]
     }),
-
+    ServeStaticModule.forRoot({
+      rootPath: join(process.cwd(),'public'),
+      serveRoot: '/public/'
+    }),
     MovieModule,
 
     DirectorModule,
