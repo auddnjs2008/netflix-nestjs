@@ -36,6 +36,11 @@ export class Movie extends BaseTable {
     detail:MovieDetail
 
 
+    @Column()
+    movieFilePath:string;
+
+    
+
 
     @ManyToOne(
         ()=>Director,
