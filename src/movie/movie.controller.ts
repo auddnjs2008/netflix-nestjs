@@ -29,8 +29,9 @@ export class MovieController {
   
   getMovies(
     @Query() dto:GetMoviesDto,
+    @UserId()userId?: number
   ){
-    return this.movieService.findAll(dto);
+    return this.movieService.findAll(dto,userId);
   }
 
   @Get(':id')
@@ -67,4 +68,43 @@ export class MovieController {
       return this.movieService.remove(id);
   }
 
+  /**
+   *   [Like] [DisLike]
+   * 
+   *   아무것도 누르지 않은 상태
+   *   Like & DisLike모두 버튼 꺼져있음
+   * 
+   *   Like 버튼 누르면 
+   *   Like 버튼 불 켜짐
+   * 
+   *   Like 버튼 불 꺼짐
+   * 
+   *   DisLike 버튼 누르면
+   *   DisLike 버튼 불 켜짐
+   * 
+   *   DisLike 버튼 다시 누르면
+   *   DisLike 버튼 불 꺼짐
+   * 
+   *   Like 버튼 투름
+   *   Like 버튼 불 켜짐 
+   * 
+   *   DisLike 버튼 누름
+   *   Like버튼 불 꺼지고 DisLike  버튼 불 켜짐
+   * 
+   */
+  @Post(':id/like')
+  createMovieLike(
+    @Param('id',ParseIntPipe) movieId:number,
+    @UserId() userId:number
+  ){  
+    return this.movieService.toggleMovieLike(movieId,userId,true);
+  }
+
+  @Post(':id/dislike')
+  createMovieDisLike(
+    @Param('id',ParseIntPipe) movieId:number,
+    @UserId() userId:number
+  ){
+    return this.movieService.toggleMovieLike(movieId,userId,false);
+  }
 }

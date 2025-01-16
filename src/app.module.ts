@@ -24,6 +24,7 @@ import { MulterModule } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import {join} from 'path';
 import { ServeStaticModule } from '@nestjs/serve-static';
+import { MovieUserLike } from './movie/entity/movie-user-like.entity';
 
 @Module({
   imports: [
@@ -53,6 +54,7 @@ import { ServeStaticModule } from '@nestjs/serve-static';
           entities:[
             Movie,
             MovieDetail,
+            MovieUserLike,
             Director,
             Genre,
             User
