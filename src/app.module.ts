@@ -25,6 +25,7 @@ import { diskStorage } from 'multer';
 import {join} from 'path';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { MovieUserLike } from './movie/entity/movie-user-like.entity';
+import { CacheModule } from '@nestjs/cache-manager';
 
 @Module({
   imports: [
@@ -66,6 +67,10 @@ import { MovieUserLike } from './movie/entity/movie-user-like.entity';
     ServeStaticModule.forRoot({
       rootPath: join(process.cwd(),'public'),
       serveRoot: '/public/'
+    }),
+    CacheModule.register({
+      ttl:0,
+      isGlobal:true
     }),
     MovieModule,
 

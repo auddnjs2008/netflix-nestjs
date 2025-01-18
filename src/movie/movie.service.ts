@@ -44,7 +44,6 @@ export class MovieService {
     const cacheData = await this.cacheManager.get('MOVIE_RECENT');
 
     if(cacheData){
-      console.log('cache가져오기 ')
       return cacheData;
     }
 
