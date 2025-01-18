@@ -34,6 +34,16 @@ export class MovieController {
     return this.movieService.findAll(dto,userId);
   }
 
+
+
+  @Get('recent')
+  getMoviesRecent(){
+     return this.movieService.findRecent();
+  }
+
+
+
+  /// /movie/asdfasdf => 다 걸린다.
   @Get(':id')
   @Public()
   getMovie(@Param('id', ParseIntPipe) id: number,
