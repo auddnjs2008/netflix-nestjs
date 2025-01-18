@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Role, User } from 'src/user/entities/user.entity';
 import { Repository } from 'typeorm';
@@ -6,6 +6,7 @@ import * as bcrypt from 'bcrypt';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { envVariableKeys } from 'src/common/const/env.const';
+import { Cache, CACHE_MANAGER } from '@nestjs/cache-manager';
 
 @Injectable()
 
@@ -17,10 +18,29 @@ export class AuthService {
         @InjectRepository(User)
         private readonly userRepository:Repository<User>,
         private readonly configService:ConfigService,
-        private readonly jwtService:JwtService
+        private readonly jwtService:JwtService,
+        @Inject(CACHE_MANAGER)
+        private readonly cacheManager:Cache
     ){
 
     }
+
+    async tokenBlock(token:string){
+
+        const payload = this.jwtService.decode(token);
+
+        const expiryDate = +new Date(payload['exp']*1000);
+        const now = +Date.now();
+
+        const differenceInSeconds = (expiryDate - now)/1000;
+
+        await this.cacheManager.set(`BLOCK_TOKEN_${token}`,payload,
+            Math.max((differenceInSeconds)* 1000,1)
+        );
+
+        return true;
+    }
+
 
     parseBasicToken(rawToken:string){
         /// 1) 토큰을  ' ' 기준으로 스플릿한 후 토큰 값만 가져오기

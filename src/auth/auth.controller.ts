@@ -1,4 +1,4 @@
-import { Controller, Get, Headers, Post, Request, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Headers, Post, Request, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthGuard } from '@nestjs/passport';
 import { LocalAuthGuard } from './strategy/local.strategy';
@@ -25,6 +25,13 @@ export class AuthController {
     return this.authService.login(token);
   }
 
+
+  @Post('token/block')
+  blockToken(
+    @Body('token') token:string
+  ){
+    return this.authService.tokenBlock(token);
+  }
 
 
   @Post('token/access')

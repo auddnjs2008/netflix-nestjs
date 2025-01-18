@@ -1,5 +1,5 @@
 import { Cache, CACHE_MANAGER } from "@nestjs/cache-manager";
-import { BadRequestException, Inject, Injectable, NestMiddleware, UnauthorizedException } from "@nestjs/common";
+import { BadRequestException, ForbiddenException, Inject, Injectable, NestMiddleware, UnauthorizedException } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
 import { NextFunction, Request, Response } from "express";
@@ -26,56 +26,66 @@ export class BearerTokenMiddleware implements NestMiddleware{
             next();
             return;
         }
-                try{
-                    const token = this.validateBearerToken(authHeader);
 
-                    const tokenKey = `TOKEN_${token}`;
-                    const cachedPayload = await this.cacheManager.get(tokenKey)
+        const token = this.validateBearerToken(authHeader);
 
-                    if(cachedPayload){
-                        console.log('---cache run ----')
-                        req.user = cachedPayload;
+        const blockedToken = await this.cacheManager.get(`BLOCK_TOKEN_${token}`);
 
-                        return next();
-                    }
+        if(blockedToken){
+            throw new UnauthorizedException('차단된 토큰입니다.')
+        }
+
+            const tokenKey = `TOKEN_${token}`;
+            const cachedPayload = await this.cacheManager.get(tokenKey)
+
+            if(cachedPayload){
+                console.log('---cache run ----')
+                req.user = cachedPayload;
+
+                return next();
+            }
 
 
-                    const decodedPayload = this.jwtService.decode(token);
-                    if(decodedPayload.type !== 'refresh'  && decodedPayload.type !== 'access'){
-                        throw new UnauthorizedException('잘못된 토큰입니다.');
-                    }
+            const decodedPayload = this.jwtService.decode(token);
+            if(decodedPayload.type !== 'refresh'  && decodedPayload.type !== 'access'){
+                throw new UnauthorizedException('잘못된 토큰입니다.');
+            }
 
 
-                    const secretKey = decodedPayload.type === 'refresh' ?  envVariableKeys.refreshTokenSecret : envVariableKeys.accessTokenSecret;
-
-                    const payload = await this.jwtService.verifyAsync(token,{
-                        secret:this.configService.get<string>(secretKey)
-                    });
-
-                    /// payload['exp'] epoch time seconds
-                    const expiryDate = +new Date(payload['exp']*1000);
-                    const now = +Date.now();
-
-                    const differenceInSeconds = (expiryDate - now)/1000;
-
-                    await this.cacheManager.set(tokenKey,payload,
-                        Math.max((differenceInSeconds - 30)* 1000,1)
-                    );
-                    
-                    req.user=payload;
-                    next();
+        try{
             
-                }catch(e){
-                    if(e.name === 'TokenExpiredError'){
-                        throw new UnauthorizedException('토큰이 만료되었습니다.')
-                    }
 
 
-                    next();
-                    // 어차피 가드에서 막을것
-                }
-        
-                
+            const secretKey = decodedPayload.type === 'refresh' ?  envVariableKeys.refreshTokenSecret : envVariableKeys.accessTokenSecret;
+
+            const payload = await this.jwtService.verifyAsync(token,{
+                secret:this.configService.get<string>(secretKey)
+            });
+
+            /// payload['exp'] epoch time seconds
+            const expiryDate = +new Date(payload['exp']*1000);
+            const now = +Date.now();
+
+            const differenceInSeconds = (expiryDate - now)/1000;
+
+            await this.cacheManager.set(tokenKey,payload,
+                Math.max((differenceInSeconds - 30)* 1000,1)
+            );
+            
+            req.user=payload;
+            next();
+    
+        }catch(e){
+            if(e.name === 'TokenExpiredError'){
+                throw new UnauthorizedException('토큰이 만료되었습니다.')
+            }
+
+
+            next();
+            // 어차피 가드에서 막을것
+        }
+
+            
         
                 
         
