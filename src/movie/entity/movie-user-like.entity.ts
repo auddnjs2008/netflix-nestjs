@@ -12,7 +12,10 @@ export class MovieUserLike {
     })
     @ManyToOne(
         () => Movie,
-        (movie) => movie.likedUsers
+        (movie) => movie.likedUsers,
+        {
+            onDelete: 'CASCADE'
+        }
     )
     movie : Movie;
 
@@ -22,7 +25,10 @@ export class MovieUserLike {
     })
     @ManyToOne(
         () => User,
-        (user) => user.likedMovies
+        (user) => user.likedMovies,
+        {
+            onDelete: 'CASCADE'
+        }
     )
     user: User;
 
