@@ -15,6 +15,7 @@ import { MovieFilePipe } from './pipe/movie-file.pipe';
 import { UserId } from 'src/user/decorator/user-id.decorator';
 import { QueryRunner } from 'src/common/decorator/querry-runner.decorator';
 import { QueryRunner as QR } from 'typeorm';
+import { CacheKey, CacheTTL, CacheInterceptor as CI } from '@nestjs/cache-manager';
 
 
 
@@ -37,7 +38,11 @@ export class MovieController {
 
 
   @Get('recent')
+  @UseInterceptors(CI)
+  @CacheKey('getMoviesRecent')
+  @CacheTTL(1000)
   getMoviesRecent(){
+    console.log('getMoviesRecent실행()!');
      return this.movieService.findRecent();
   }
 
