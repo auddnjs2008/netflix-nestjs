@@ -5,17 +5,29 @@ import { readdir, unlink } from "fs/promises";
 import { join , parse} from "path";
 import { Movie } from "src/movie/entity/movie.entity";
 import { Repository } from "typeorm";
+import { Logger } from "@nestjs/common";
 
 @Injectable()
 export class TasksService{
+    private readonly logger = new Logger(TasksService.name);
+
+
     constructor(
         @InjectRepository(Movie)
         private readonly movieRepository:Repository<Movie>,
         private readonly schedulerRegistry:SchedulerRegistry
     ){}
 
+    @Cron('*/5 * * * * *')
     logEverySecond(){
-        console.log('1초마다 실행!');
+
+        this.logger.fatal('fatal 레벨 로그');
+        this.logger.error('error 레벨 로그');
+        this.logger.warn('warn 레벨 로그');
+        this.logger.log('log 레벨 로그');
+        this.logger.debug('DEBUG 레벨 로그');
+        this.logger.verbose('verBose 레벨 로그');
+
     }
 
     // @Cron('* * * * * *')
@@ -72,15 +84,15 @@ export class TasksService{
         )
     }
 
-    @Cron('* * * * * *',{
-        name:'printer',
+    // @Cron('* * * * * *',{
+    //     name:'printer',
 
-    })
+    // })
     printer(){
         console.log('print every seconds');
     }
 
-    @Cron('*/5 * * * * *')
+    // @Cron('*/5 * * * * *')
     stopper(){
         console.log('---- stopper run ---');
         const job = this.schedulerRegistry.getCronJob('printer');
