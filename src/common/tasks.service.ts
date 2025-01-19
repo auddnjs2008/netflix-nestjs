@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { Cron } from "@nestjs/schedule";
+import { Cron, SchedulerRegistry } from "@nestjs/schedule";
 import { InjectRepository } from "@nestjs/typeorm";
 import { readdir, unlink } from "fs/promises";
 import { join , parse} from "path";
@@ -10,7 +10,8 @@ import { Repository } from "typeorm";
 export class TasksService{
     constructor(
         @InjectRepository(Movie)
-        private readonly movieRepository:Repository<Movie>
+        private readonly movieRepository:Repository<Movie>,
+        private readonly schedulerRegistry:SchedulerRegistry
     ){}
 
     logEverySecond(){
@@ -69,6 +70,33 @@ export class TasksService{
             )
             `
         )
+    }
+
+    @Cron('* * * * * *',{
+        name:'printer',
+
+    })
+    printer(){
+        console.log('print every seconds');
+    }
+
+    @Cron('*/5 * * * * *')
+    stopper(){
+        console.log('---- stopper run ---');
+        const job = this.schedulerRegistry.getCronJob('printer');
+
+        console.log('# Last Date');
+        console.log(job.lastDate());
+        console.log('# next Date')
+        console.log(job.nextDate());
+        console.log('# next Dates')
+        console.log(job.nextDates(5));
+
+        if(job.running){
+            job.stop();
+        }else{
+            job.start();
+        }
     }
 
 }
