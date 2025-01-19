@@ -23,7 +23,7 @@ export class TasksService{
         private readonly logger:LoggerService
     ){}
 
-    @Cron('*/5 * * * * *')
+    // @Cron('*/5 * * * * *')
     logEverySecond(){
 
         this.logger.fatal('fatal 레벨 로그',null,TasksService.name);

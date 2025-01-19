@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query, UseInterceptors, ClassSerializerInterceptor, ParseIntPipe, BadRequestException, NotFoundException, ParseFloatPipe, ParseBoolPipe, ParseArrayPipe, ParseUUIDPipe, ParseEnumPipe, DefaultValuePipe, Request, UseGuards, UploadedFile, UploadedFiles } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, UseInterceptors, ClassSerializerInterceptor, ParseIntPipe, BadRequestException, NotFoundException, ParseFloatPipe, ParseBoolPipe, ParseArrayPipe, ParseUUIDPipe, ParseEnumPipe, DefaultValuePipe, Request, UseGuards, UploadedFile, UploadedFiles, Version, VERSION_NEUTRAL } from '@nestjs/common';
 import { MovieService } from './movie.service';
 import { CreateMovieDto } from './dto/create-movie.dto';
 import { UpdateMovieDto } from './dto/update-movie.dto';
@@ -19,9 +19,21 @@ import { CacheKey, CacheTTL, CacheInterceptor as CI } from '@nestjs/cache-manage
 import { Throttle } from 'src/common/decorator/throttle.decorator';
 
 
+@Controller({
+  path:'movie',
+  version:'2'
+})
+export class MovieControllerv2{
+  @Get()
+  getMovies(){
+    return[]
+  }
+}
 
-
-@Controller('movie')
+@Controller({
+  path:'movie',
+  version: VERSION_NEUTRAL
+})
 @UseInterceptors(ClassSerializerInterceptor)
 export class MovieController {
   constructor(private readonly movieService: MovieService) {}
@@ -32,6 +44,7 @@ export class MovieController {
     count:5,
     unit:'minute'
   })
+
   getMovies(
     @Query() dto:GetMoviesDto,
     @UserId()userId?: number
