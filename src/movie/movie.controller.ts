@@ -17,23 +17,14 @@ import { QueryRunner } from 'src/common/decorator/querry-runner.decorator';
 import { QueryRunner as QR } from 'typeorm';
 import { CacheKey, CacheTTL, CacheInterceptor as CI } from '@nestjs/cache-manager';
 import { Throttle } from 'src/common/decorator/throttle.decorator';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
 
-@Controller({
-  path:'movie',
-  version:'2'
-})
-export class MovieControllerv2{
-  @Get()
-  getMovies(){
-    return[]
-  }
-}
 
 @Controller({
   path:'movie',
-  version: VERSION_NEUTRAL
 })
+@ApiBearerAuth()
 @UseInterceptors(ClassSerializerInterceptor)
 export class MovieController {
   constructor(private readonly movieService: MovieService) {}
