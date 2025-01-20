@@ -17,7 +17,7 @@ import { QueryRunner } from 'src/common/decorator/querry-runner.decorator';
 import { QueryRunner as QR } from 'typeorm';
 import { CacheKey, CacheTTL, CacheInterceptor as CI } from '@nestjs/cache-manager';
 import { Throttle } from 'src/common/decorator/throttle.decorator';
-import { ApiBearerAuth } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
 
 
 
@@ -35,7 +35,17 @@ export class MovieController {
     count:5,
     unit:'minute'
   })
-
+  @ApiOperation({
+    description: '[Movie]를 페이지네이션'
+  })
+  @ApiResponse({
+    status:200,
+    description:'성공적으로 api를 실행했을때'
+  })
+  @ApiResponse({
+    status:400,
+    description:'페이지네이션 데이터를 잘못 입력했을때'
+  })
   getMovies(
     @Query() dto:GetMoviesDto,
     @UserId()userId?: number
