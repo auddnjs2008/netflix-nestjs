@@ -30,6 +30,7 @@ import { ThrottleInterceptor } from './common/interceptor/throttle.interceptor';
 import { ScheduleModule } from '@nestjs/schedule';
 import { WinstonModule } from 'nest-winston';
 import * as winston from 'winston'
+import { UserService } from './user/user.service';
 
 @Module({
   imports: [
@@ -111,7 +112,6 @@ import * as winston from 'winston'
     AuthModule,
 
     UserModule,
-    
   ],
   providers:[
     {
