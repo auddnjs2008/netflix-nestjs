@@ -51,8 +51,8 @@ describe('DirectorService', () => {
       jest.spyOn(mockDirectorRepository,'save').mockResolvedValue(createDirectorDto);
       const result = await directorService.create(createDirectorDto)
 
-      expect(mockDirectorRepository.save).toHaveBeenCalledWith(createDirectorDto);
-      expect(result).toBe(createDirectorDto);
+      expect(directorRepository.save).toHaveBeenCalledWith(createDirectorDto);
+      expect(result).toEqual(createDirectorDto);
     })
   })
 
@@ -62,7 +62,8 @@ describe('DirectorService', () => {
       jest.spyOn(mockDirectorRepository,'find').mockResolvedValue(directors);
 
       const result = await directorService.findAll();
-      expect(result).toBe(directors);
+      expect(directorRepository.find).toHaveBeenCalled();
+      expect(result).toEqual(directors);
     })
   })
 
@@ -73,10 +74,10 @@ describe('DirectorService', () => {
 
       const result = await directorService.findOne(1);
 
-      expect(mockDirectorRepository.findOne).toHaveBeenCalledWith(
+      expect(directorRepository.findOne).toHaveBeenCalledWith(
         {where:{id:1}}
       );
-      expect(result).toBe(director);
+      expect(result).toEqual(director);
     })
   });
 
@@ -89,7 +90,7 @@ describe('DirectorService', () => {
       jest.spyOn(mockDirectorRepository,'findOne').mockResolvedValueOnce({...director,...updateDirectorDto});
 
       const result = await directorService.update(id,updateDirectorDto);
-      expect(mockDirectorRepository.findOne).toHaveBeenCalledWith({
+      expect(directorRepository.findOne).toHaveBeenCalledWith({
         where: {
           id:1
         }
@@ -113,11 +114,12 @@ describe('DirectorService', () => {
       jest.spyOn(mockDirectorRepository,'findOne').mockResolvedValue(director);
       
       const result = await directorService.remove(id);
-      expect(mockDirectorRepository.findOne).toHaveBeenCalledWith({
+      expect(directorRepository.findOne).toHaveBeenCalledWith({
         where:{
           id
         }
       });
+      expect(directorRepository.delete).toHaveBeenCalledWith(id);
       expect(result).toBe(id);
     })
 
