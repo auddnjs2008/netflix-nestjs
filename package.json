@@ -21,7 +21,8 @@
     "test:user": "jest --testPathPattern=src/user --coverage --collectCoverageFrom=src/user/**",
     "test:user:watch": "jest --watch --testPathPattern=src/user --coverage --collectCoverageFrom=src/user/**",
     "test:auth:watch": "jest --watch --testPathPattern=src/auth --coverage --collectCoverageFrom=src/auth/**",
-    "test:director:watch": "jest --watch --testPathPattern=src/director --coverage --collectCoverageFrom=src/director/**"
+    "test:director:watch": "jest --watch --testPathPattern=src/director --coverage --collectCoverageFrom=src/director/**",
+    "test:genre:watch": "jest --watch --testPathPattern=src/genre --coverage --collectCoverageFrom=src/genre/**"
 
   },
   "dependencies": {

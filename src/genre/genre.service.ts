@@ -29,8 +29,8 @@ export class GenreService {
     return this.genreRepository.find();
   }
 
-  findOne(id: number) {
-    const genre = this.genreRepository.findOne({
+  async findOne(id: number) {
+    const genre =await this.genreRepository.findOne({
       where:{
         id
       }
@@ -44,7 +44,7 @@ export class GenreService {
   }
 
   async update(id: number, updateGenreDto: UpdateGenreDto) {
-     const genre = this.genreRepository.findOne({
+     const genre =await this.genreRepository.findOne({
       where:{id}
      });
      if(!genre){
@@ -59,7 +59,7 @@ export class GenreService {
   }
 
   async remove(id: number) {
-    const genre = this.genreRepository.findOne({
+    const genre = await this.genreRepository.findOne({
       where:{id}
      });
      if(!genre){
