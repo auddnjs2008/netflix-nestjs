@@ -136,16 +136,20 @@ export class MovieService {
       // },relations:['director','genres']});  
   }
 
-
-  async findOne(id:number){
-
-    const movie = await this.movieRepository.createQueryBuilder('movie')
+  /* istanbul ignore next */
+  async findMovieDetail(movieId:number){
+    return await this.movieRepository.createQueryBuilder('movie')
     .leftJoinAndSelect('movie.director','director')
     .leftJoinAndSelect('movie.genres','genres')
     .leftJoinAndSelect('movie.detail','detail')
     .leftJoinAndSelect('movie.creator','creator')
-    .where('movie.id= :id',{id})
+    .where('movie.id= :id',{id:movieId})
     .getOne();
+  }
+
+  async findOne(id:number){
+
+    const movie = await this.findMovieDetail(id);
 
     return movie;
 
@@ -159,6 +163,53 @@ export class MovieService {
   
     // return movie
   }
+
+  /* istanbul ignore next */
+  async createMovieDetail(qr:QueryRunner,createMovieDto:CreateMovieDto){
+    return qr.manager.createQueryBuilder()
+    .insert()
+    .into(MovieDetail)
+    .values({
+      detail:createMovieDto.detail
+    })
+    .execute();
+  }
+
+  /* istanbul ignore next */
+  async createMovie(qr:QueryRunner,createMovieDto:CreateMovieDto,director:Director,movieDetailId:number,userId:number,movieFolder:string){
+    return await qr.manager.createQueryBuilder()
+    .insert()
+    .into(Movie)
+    .values({
+          title:createMovieDto.title,
+          detail:{
+            id:movieDetailId
+          },
+          director,
+          creator:{
+            id:userId
+          },
+          movieFilePath:join(movieFolder,createMovieDto.movieFileName)
+    })
+    .execute();
+  }
+
+  /* istanbul ignore next */
+  async createMovieGenreRelation(qr:QueryRunner,movieId:number,genres:Genre[]){
+    return qr.manager.createQueryBuilder()
+    .relation(Movie,'genres')
+    .of(movieId)
+    .add(genres.map(genre => genre.id));
+  }
+
+  /* istanbul ignore next */
+  async renameMovieFile(tempFolder:string,movieFolder:string,createMovieDto:CreateMovieDto){
+    return rename(
+      join(process.cwd(),tempFolder,createMovieDto.movieFileName),
+      join(process.cwd(),movieFolder,createMovieDto.movieFileName)
+    );
+  }
+
 
   async create(createMovieDto:CreateMovieDto,userId:number, qr :QueryRunner,){
  
@@ -185,13 +236,7 @@ export class MovieService {
         } `);
       }
   
-      const movieDetail = await qr.manager.createQueryBuilder()
-      .insert()
-      .into(MovieDetail)
-      .values({
-        detail:createMovieDto.detail
-      })
-      .execute();
+      const movieDetail = await this.createMovieDetail(qr,createMovieDto);
 
      
       const movieDetailId = movieDetail.identifiers[0].id;
@@ -200,34 +245,14 @@ export class MovieService {
       const tempFolder = join('public','temp');
 
      
-      const movie = await qr.manager.createQueryBuilder()
-      .insert()
-      .into(Movie)
-      .values({
-            title:createMovieDto.title,
-            detail:{
-              id:movieDetailId
-            },
-            director,
-            creator:{
-              id:userId
-            },
-            movieFilePath:join(movieFolder,createMovieDto.movieFileName)
-      })
-      .execute();
+      const movie = await this.createMovie(qr,createMovieDto,director,movieDetailId,userId,movieFolder);
   
       const movieId = movie.identifiers[0].id;
   
-      await qr.manager.createQueryBuilder()
-      .relation(Movie,'genres')
-      .of(movieId)
-      .add(genres.map(genre => genre.id));
+      await this.createMovieGenreRelation(qr,movieId,genres);
 
      
-      await rename(
-        join(process.cwd(),tempFolder,createMovieDto.movieFileName),
-        join(process.cwd(),movieFolder,createMovieDto.movieFileName)
-      );
+      await this.renameMovieFile(tempFolder,movieFolder,createMovieDto);
   
       return await qr.manager.findOne(Movie,{
         where:{
