@@ -16,14 +16,16 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
+    "test:cov:watch" : "jest --coverage --watchAll",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "test:user": "jest --testPathPattern=src/user --coverage --collectCoverageFrom=src/user/**",
     "test:user:watch": "jest --watch --testPathPattern=src/user --coverage --collectCoverageFrom=src/user/**",
     "test:auth:watch": "jest --watch --testPathPattern=src/auth --coverage --collectCoverageFrom=src/auth/**",
     "test:director:watch": "jest --watch --testPathPattern=src/director --coverage --collectCoverageFrom=src/director/**",
-    "test:genre:watch": "jest --watch --testPathPattern=src/genre --coverage --collectCoverageFrom=src/genre/**"
-
+    "test:genre:watch": "jest --watch --testPathPattern=src/genre --coverage --collectCoverageFrom=src/genre/**",
+    "test:movie:watch": "jest --watch --testPathPattern=src/movie --coverage --collectCoverageFrom=src/movie/**"
+  
   },
   "dependencies": {
     "@nestjs/cache-manager": "^3.0.0",
@@ -57,6 +59,8 @@
     "winston": "^3.17.0"
   },
   "devDependencies": {
+    "@automock/adapters.nestjs": "^2.1.0",
+    "@automock/jest": "^2.1.0",
     "@nestjs/cli": "^10.0.0",
     "@nestjs/schematics": "^10.0.0",
     "@nestjs/testing": "^10.0.0",
@@ -88,7 +92,9 @@
       "json",
       "ts"
     ],
-    "roots": ["src"],
+    "roots": [
+      "src"
+    ],
     "testRegex": ".*\\.spec\\.ts$",
     "transform": {
       "^.+\\.(t|j)s$": "ts-jest"
@@ -96,18 +102,20 @@
     "collectCoverageFrom": [
       "**/*.(t|j)s"
     ],
-    "coveragePathIgnorePatterns":[
+    "coveragePathIgnorePatterns": [
       "module.ts",
       "dto.ts",
       "entity.ts",
       "guard.ts",
       "middleware.ts",
       "strategy.ts",
-      "decorator.ts"
+      "decorator.ts",
+      "pipe.ts",
+      "common/*"
     ],
     "coverageDirectory": "./coverage",
     "testEnvironment": "node",
-    "moduleNameMapper":{
+    "moduleNameMapper": {
       "src/(.*)": "<rootDir>/src/$1"
     }
   }

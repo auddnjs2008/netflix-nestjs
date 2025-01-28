@@ -59,6 +59,22 @@ export class MovieService {
     return data;
   }
 
+  /* istanbul ignore next */
+  async getMovies(){
+    return this.movieRepository.createQueryBuilder('movie')
+    .leftJoinAndSelect('movie.director','director')
+    .leftJoinAndSelect('movie.genres','genres')
+  }
+
+  /* istanbul ignore next */
+  async getLikedMovies(movieIds:number[],userId:number){
+    return movieIds.length < 1 ? [] : await this.movieUserLikeRepository.createQueryBuilder('mul')
+    .leftJoinAndSelect('mul.user','user')
+    .leftJoinAndSelect('mul.movie','movie')
+    .where('movie.id IN (:...movieIds)', {movieIds})
+    .andWhere('user.id = :userId',{userId})
+    .getMany();
+  }
 
 
   async findAll(dto:GetMoviesDto,userId?:number){
@@ -66,9 +82,7 @@ export class MovieService {
     const {title} = dto;
 
 
-    const qb = await this.movieRepository.createQueryBuilder('movie')
-    .leftJoinAndSelect('movie.director','director')
-    .leftJoinAndSelect('movie.genres','genres')
+    const qb = await this.getMovies();
 
 
 
@@ -85,12 +99,7 @@ export class MovieService {
     if(userId){
       const movieIds = data.map(movie => movie.id);
 
-      const likedMovies = movieIds.length < 1 ? [] : await this.movieUserLikeRepository.createQueryBuilder('mul')
-      .leftJoinAndSelect('mul.user','user')
-      .leftJoinAndSelect('mul.movie','movie')
-      .where('movie.id IN (:...movieIds)', {movieIds})
-      .andWhere('user.id = :userId',{userId})
-      .getMany();
+      const likedMovies = await this.getLikedMovies(movieIds,userId);
 
       /**
        * {
