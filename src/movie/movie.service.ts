@@ -150,6 +150,10 @@ export class MovieService {
   async findOne(id:number){
 
     const movie = await this.findMovieDetail(id);
+    if (!movie) {
+      throw new NotFoundException('존재하지 않는 ID의 영화입니다!');
+    }
+
 
     return movie;
 
