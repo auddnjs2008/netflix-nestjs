@@ -13,7 +13,7 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { CACHE_MANAGER,Cache } from '@nestjs/cache-manager';
 import { GetMoviesDto } from './dto/get-movies.dto';
 import { CreateMovieDto } from './dto/create-movie.dto';
-import { NotFoundException } from '@nestjs/common';
+import { BadRequestException, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { identity } from 'rxjs';
 import { UpdateMovieDto } from './dto/update-movie.dto';
 
@@ -595,7 +595,63 @@ describe('MovieService', () => {
       }, {isLike: false});
 
       expect(result).toEqual({isLike: false});
+    });
+
+    it('should delete like record when isLike is the same as the existing record', async () => {
+      const movie = {id:1};
+      const user = {id: 1};
+      const likeRecord = {movie,user,isLike:true};
+
+      findOneMovieMock.mockResolvedValue(movie);
+      findOneUserMock.mockResolvedValue(user);
+      getLikedRecordMock.mockResolvedValueOnce(likeRecord)
+      .mockResolvedValueOnce(null);
+
+      const result = await movieService.toggleMovieLike(1,1,true);
+      expect(findOneMovieMock).toHaveBeenCalledWith({where:{id:1}});
+      expect(findOneUserMock).toHaveBeenCalledWith({where:{id:1}});
+      expect(getLikedRecordMock).toHaveBeenCalledWith(1,1);
+      expect(deleteLikeMock).toHaveBeenCalledWith({movie,user});
+      expect(result).toEqual({isLike:null});
+    });
+
+    it('should save a new like record when no existing record is found', async () => {
+      const movie = {id:1};
+      const user = {id:1};
+      findOneMovieMock.mockResolvedValue(movie);
+      findOneUserMock.mockResolvedValue(user);
+      getLikedRecordMock.mockResolvedValueOnce(null)
+      .mockResolvedValueOnce({isLike:true});
+
+      const result = await movieService.toggleMovieLike(1,1,true);
+
+      expect(findOneMovieMock).toHaveBeenCalledWith({where:{id:1}});
+      expect(findOneUserMock).toHaveBeenCalledWith({where:{id:1}});
+      expect(getLikedRecordMock).toHaveBeenCalledWith(1,1);
+      expect(saveLikeMock).toHaveBeenCalledWith({movie,user,isLike:true});
+      expect(result).toEqual({isLike:true});
+    });
+
+    it('should throw BadRequestException if movie does not exist', async () => {
+      findOneMovieMock.mockResolvedValue(null);
+
+      await expect(movieService.toggleMovieLike(1,1,true)).rejects.toThrow(BadRequestException);
+      expect(findOneMovieMock).toHaveBeenCalledWith({where:{id:1}});
+      expect(findOneUserMock).not.toHaveBeenCalled();
+    
+    });
+
+    it('should throw UnauthorizedException if user does not exist', async () => {
+      const movie = {id:1};
+      findOneMovieMock.mockResolvedValue(movie);
+      findOneUserMock.mockResolvedValue(null);
+
+      await expect(movieService.toggleMovieLike(1,1,true)).rejects.toThrow(UnauthorizedException);
+      expect(findOneMovieMock).toHaveBeenCalledWith({where:{id:1}});
+      expect(findOneUserMock).toHaveBeenCalledWith({where:{id:1}});
     })
+
+    
 
   })
 

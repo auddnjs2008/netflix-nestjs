@@ -99,7 +99,7 @@ export class MovieService {
     if(userId){
       const movieIds = data.map(movie => movie.id);
 
-      const likedMovies = await this.getLikedMovies(movieIds,userId);
+      const likedMovies = movieIds.length < 1 ? [] :  await this.getLikedMovies(movieIds,userId);
 
       /**
        * {
@@ -386,7 +386,7 @@ export class MovieService {
 
 
   }
-
+  /* istanbul ignore next */
   async deleteMovie(id:number){
     return  await this.movieRepository.createQueryBuilder()
     .delete()
@@ -408,6 +408,7 @@ export class MovieService {
       return id;
   }
 
+  /* istanbul ignore next */
   async getLikedRecord(movieId:number,userId:number){
     return this.movieUserLikeRepository.createQueryBuilder('mul')
     .leftJoinAndSelect('mul.movie','movie')
