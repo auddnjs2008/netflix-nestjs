@@ -36,8 +36,9 @@ import { UserService } from './user/user.service';
   imports: [
     ConfigModule.forRoot({
       isGlobal:true,
+      envFilePath:process.env.NODE_ENV === 'test' ? 'test.env' : '.env',
       validationSchema: Joi.object({
-        ENV : Joi.string().valid('dev','prod').required(), 
+        ENV : Joi.string().valid('test','dev','prod').required(), 
         DB_TYPE : Joi.string().valid('postgres').required(),
         DB_HOST : Joi.string().required(),
         DB_PORT :  Joi.number().required(),        
